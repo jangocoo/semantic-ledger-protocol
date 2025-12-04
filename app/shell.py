@@ -1,57 +1,84 @@
 from __future__ import annotations
-
 import sys
 import time
-from pathlib import Path
+import json
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from fastdtw import fastdtw
+from scipy.spatial.distance import cosine
 
-from core.embeddings import ToyHashEmbeddingBackend
-from core.novelty import NoveltyParams
-from core.persistence import open_db, load_state_from_db, persist_concept, get_lineage_chain
-from core.state import CoreParams, CoreState, Submission, integrate_submission
+DB_FILE = "trajectories.jsonl"
+MODEL_NAME = "microsoft/phi-2"
 
-
-def make_core_params() -> CoreParams:
-    novelty = NoveltyParams(k=8, r=0.3, alpha=1.0, beta=1.0)
-    return CoreParams(
-        embedding_version="toy-hash-dim64",
-        novelty=novelty,
-        k=8,
-        p=4,
-        tau=0.6,
-        delta=0.1,
-    )
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+model = AutoModelForCausalLM.from_pretrained(
+    MODEL_NAME,
+    output_hidden_states=True,
+    torch_dtype=torch.float32,
+    device_map="auto"
+)
 
 
-def print_concept_result(state: CoreState, concept_id: str) -> None:
-    from core.state import Concept  # local import to avoid cycles in type hints
+def token_trajectory(text: str):
+    tokens = tokenizer(text, return_tensors="pt")
+    with torch.no_grad():
+        out = model(**tokens)
+    
+    # hidden_states: tuple of (layer0, layer1, ..., layer_last)
+    final_layer_hidden = out.hidden_states[-1][0]  # shape: [T, D]
 
-    concept = state.concepts[concept_id]
-    print("\n=== Concept Integrated ===")
-    print(f"ID: {concept.id}")
-    print(f"Novelty score N: {concept.novelty_score:.4f}")
-    meta = concept.metadata
-    print(f"Timestamp: {meta.get('timestamp')}")
-    print(f"Near duplicate: {bool(meta.get('is_near_duplicate'))}")
-    if meta.get("primary_duplicate_id"):
-        print(f"Primary duplicate ID: {meta.get('primary_duplicate_id')}")
-    print(f"Parents: {concept.parents or '[]'}")
+    # Convert to list of CPU numpy vectors
+    traj = [v.cpu().float().numpy() for v in final_layer_hidden]
+    return traj
 
-    # Lineage chain
-    print("\nLineage (from newest to root):")
-    chain = get_lineage_chain(state, concept_id)
-    for idx, c in enumerate(chain):
-        marker = "->" if idx > 0 else "  "
-        print(f"{marker} {c.id} (N={c.novelty_score:.4f})")
-    print()
+
+def dtw_distance(traj_a, traj_b):
+    distance, path = fastdtw(traj_a, traj_b, dist=cosine)
+    return distance
+
+
+
+def save_trajectory(text, traj):
+    record = {
+        "text": text,
+        "timestamp": time.time(),
+        "trajectory": [v.tolist() for v in traj],
+    }
+    with open(DB_FILE, "a") as f:
+        f.write(json.dumps(record) + "\n")
+
+
+def load_db():
+    items = []
+    with open(DB_FILE, "r") as f:
+        for line in f:
+            items.append(json.loads(line))
+    return items
+
+
+def find_parent(new_traj, db):
+    best_score = float("inf")
+    best_item = None
+
+    for item in db:
+        score = dtw_distance(
+            new_traj, 
+            [torch.tensor(v).numpy() for v in item["trajectory"]]
+        )
+        if score < best_score:
+            best_score = score
+            best_item = item
+    
+    return best_item, best_score
+
+
+def novelty(new_traj, db):
+    parent, score = find_parent(new_traj, db)
+    return score
 
 
 def main() -> None:
-    db_path = Path("/data/slp_core.sqlite")
-    backend = ToyHashEmbeddingBackend(dim=64, seed=0)
-    params = make_core_params()
-
-    conn = open_db(db_path)
-    state = load_state_from_db(conn)
+    
 
     print("Semantic Ledger Protocol - Core Prototype Shell")
     print("Type text and press Enter to submit as a concept.")
@@ -68,14 +95,16 @@ def main() -> None:
             print("The system will output a novelty score and lineage chain.\n")
             continue
 
-        submission = Submission(
-            payload=text,
-            authorship=["shell-user"],
-            timestamp=time.time(),
-        )
-        result = integrate_submission(submission, state, params, backend)
-        persist_concept(conn, result.concept, payload=text)
-        print_concept_result(state, result.concept.id)
+        db = load_db()
+        q_traj = token_trajectory(text)
+        parent, score = find_parent(q_traj, db)
+
+        print("Parent text:", parent["text"])
+        print("Novelty:", score)
+
+        save_trajectory(text, q_traj)
+
+
 
     print("Exiting SLP Core shell.")
 
