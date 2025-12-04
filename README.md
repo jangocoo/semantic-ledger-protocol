@@ -145,6 +145,42 @@ Establish a neutral reference standard for semantic novelty evaluation.
 Early-stage conceptual specification.
 Formal math, diagrams, and reference pseudocode will be added progressively.
 
+## Project Structure
+
+- `spec/` – Protocol-level specifications:
+  - `core-mechanism.md` – embedding, distance, novelty scoring, and lineage rules.
+  - `state-model.md` – semantic state and Concept Graph model.
+  - `threat-model.md` – Core Mechanism–level threat analysis.
+- `core/` – Single-node prototype implementation of the Core Mechanism.
+- `experiments/` – Synthetic experiment harness for probing novelty behavior.
+- `app/` – Interactive shell that uses the prototype and a local SQLite database.
+
+## Running the Prototype (Docker)
+
+Prerequisites:
+
+- Docker
+- Docker Compose v2
+
+Build and start an interactive shell:
+
+```bash
+docker-compose build
+docker-compose run --rm slp-core
+```
+
+You will see a shell prompt inside the container. Type any line of text and press Enter:
+
+- The line is embedded and integrated as a new concept.
+- The system prints a novelty score and a simple lineage chain.
+
+Commands inside the shell:
+
+- `/help` – show basic usage.
+- `/exit` or `/quit` – exit the shell.
+
+Concepts and their metadata are persisted to a SQLite database at `./data/slp_core.sqlite` on the host.
+
 ## Contributing
 
 Contributions focused on specification clarity, edge cases, and protocol-level mechanics are welcome.
