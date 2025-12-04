@@ -145,6 +145,34 @@ Establish a neutral reference standard for semantic novelty evaluation.
 Early-stage conceptual specification.
 Formal math, diagrams, and reference pseudocode will be added progressively.
 
+## Running the Prototype (Docker)
+
+Prerequisites:
+
+- Docker
+- Docker Compose v2
+
+Build and start an interactive shell:
+
+```bash
+docker-compose build
+docker-compose run --rm slp-core
+```
+
+You will see a shell prompt inside the container. Type any line of text and press Enter:
+
+- The line is embedded and integrated.
+- The system prints a novelty score and a parent.
+
+Commands inside the shell:
+
+- `/help` – show basic usage.
+- `/exit` or `/quit` – exit the shell.
+
+## Next steps
+- Make trajectory segments matching and lineage
+
+
 ## Contributing
 
 Contributions focused on specification clarity, edge cases, and protocol-level mechanics are welcome.
