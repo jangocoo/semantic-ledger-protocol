@@ -1,28 +1,173 @@
 # Semantic Ledger Protocol (SLP)
 
-A distributed protocol for measuring conceptual novelty, establishing idea provenance, and rewarding meaningful contributions.
-
+A distributed protocol for measuring conceptual novelty, establishing idea lineage, and rewarding meaningful contributions across human and AI-generated content.
 
 ## Problem
 
- - AI systems train on public content without attribution or compensation.
-
- - Creators have no visibility into how their ideas influence model behavior.
-
- - Internet monetization is not always fair to creators.
-
- - Valuable conceptual contributions are invisible—models learn ideas, not documents.
-
  - Knowledge is being absorbed into private LLMs with no shared economic value.
-
- - There is no mechanism to link “valuable idea → economic reward.”
-
+ - Creators have no visibility into how their ideas influence model behavior.
+ - The economy rewards attention, not insight.
+ - Valuable idea is not necessary links to economic reward.
+ - Internet monetization is not always fair to creators.
 
 ## Introduction
 
-Prevailing economic model rewards attention, not insight. The Semantic Ledger Protocol introduces an alternative: an economic and computational layer that evaluates originality at the conceptual level and allocates rewards accordingly.
+The Semantic Ledger Protocol introduces an alternative: an economic and computational layer that evaluates originality at the conceptual level and allocates rewards accordingly.
 
 SLP measures the conceptual distance between new submissions and existing knowledge, records the lineage of ideas, and distributes royalties to contributors whose concepts form the foundation for later work.
+
+## Vision
+
+Content forms a lineage-directed acyclic graph where every idea has an author and a semantic ancestry. Each new submission computes a novelty diff against prior concepts, quantifying true contribution. Royalties flow along this lineage, rewarding both originators of breakthrough ideas and later authors who successfully develop them.
+
+This shifts incentives toward generating genuine novelty. In the age of AI where models compress vast human work into internal representations and tend to average toward familiar patterns this provides:
+
+ - Traceable lineage from AI outputs back to human creators.
+ - A mechanism for compensating upstream contributors.
+ - A structured cost for publishing to prevent spam and fund network operation.
+
+Rewards for nodes running compute and serving the semantic graph.
+
+## Example
+
+### Stage 1 - Foundational idea
+
+A writer submits a short concept T1:
+"Cities behave like living organisms: they grow, adapt, and metabolize information."
+
+Novelty Score:0.82
+Parents: T0 (networlk genesis-level concept)
+
+Explanation:
+The idea is relatively original within the current semantic graph.
+
+### Stage 2 - A refinement that builds on it
+
+Another author submits T2:
+"A city`s transportation system acts as its circulatory system, distributing energy and resources."
+
+Novelty Score:0.41
+Parent: T1
+
+Trajectory similarity shows T2 is conceptually downstream from T1:
+ - Same metaphor frame ("cities as living organisms")
+ - More specific organ-level analogy ("circulatory system")
+ - Clear semantic continuation
+
+Royalty distribution for T2:
+ - New author (T2): 41%
+ - T1`s author: 59% (due to inherited conceptual skeleton)
+
+### Stage 3 - A different branch of elaboration
+
+A third author submits T3:
+"In living cities, information flow - not transportation - is the true lifeblood."
+
+Novelty Score:0.47
+Parents:
+ - T1 (dominant)
+ - Partial link to T2 (weaker, because it flips the framing)
+
+Explanation:
+T3 builds on T1s central metaphor but diverges sharply from T2.
+It becomes a sibling, not a child, of T2.
+
+Royalty distribution:
+ - T3 author: 47%
+ - T1 author: 53%
+ - (No significant royalty to T2; its influence is minimal)
+
+### Stage 4 - A synthesis that connects branches
+
+A writer merges both branches into a deeper insight T4:
+"A city`s circulatory and informational flows interact like biological feedback loops - transport enables data exchange, and data reorganizes transport."
+
+Novelty Score:0.36
+Parents (weighted):
+ - T2: 52%
+ - T3: 34%
+ - T1: 14%
+
+This is a semantic interpolation:
+ - It inherits the organism metaphor from T1
+ - Draws transport concepts from T2
+ - Draws information-as-lifeblood from T3
+
+Introduces a new integrated mechanism ("feedback loops")
+
+Royalty split for T₃:
+ - T4 author: 36%
+ - T2 author: 52% of remaining 64%
+ - T3 author: 34% of remaining 64%
+ - T1 author: 14% of remaining 64%
+ - T1 continues to earn small but persistent royalties across the tree.
+
+### Stage 5 - A near-duplicate derivative (low novelty)
+
+Someone submits T5:
+"Cities evolve by balancing transportation needs with information flow."
+
+Novelty Score:0.11
+Parents (dominant):
+ - T2
+ - T3
+
+Explanation:
+T5 is essentially a paraphrase of the established domain.
+The system registers it as extremely low novelty.
+
+Royalty distribution:
+ - T5 author: 11%
+ - T2, T3, T1 authors: receive the remaining 89% proportionally
+
+This illustrates how low-novelty text mostly rewards previous contributors.
+
+### Stage 6 - Behavior over time
+
+As dozens or hundreds of submissions accumulate:
+ - T1 becomes the conceptual trunk.
+ - T2 and T3 become major branches.
+ - T4 becomes a key connector node.
+ - T5 and similar nodes contribute mostly upstream.
+
+Early contributors gain long-term value for foundational concepts.
+Later contributors earn when genuinely adding new structure.
+
+
+
+                           ┌────────────────────────────────┐
+                           │   T1 (N=0.82)                  │
+                           │   "Cities as living organisms" │
+                           └──────────────┬─────────────────┘
+                                          │
+                     ┌────────────────────┼───────────────────────┐
+                     │                    │                       │
+                     │ 59%                │ 53%                   │ 14%
+                     ▼                    ▼                       ▼
+
+        ┌───────────────────────┐   ┌────────────────────────┐   (minor influence
+        │  T2 (N=0.41)          │   │  T3 (N=0.47)           │    on later nodes)
+        │  "Transport as        │   │  "Information flow is  │
+        │   circulatory system" │   │   the true lifeblood"  │
+        └───────────┬───────────┘   └───────────┬────────────┘
+                    │                           │
+                    │ 52%                       │ 34%
+                    └──────────────┬────────────┘
+                                   ▼
+                      ┌────────────────────────────────────────────┐
+                      │  T4 (N=0.36)                               │
+                      │  "Transport + information as feedback      │
+                      │   loops"                                   │
+                      └──────────────┬─────────────────────────────┘
+                                     │
+                                     │ dominates parent linkage
+                                     ▼
+                      ┌─────────────────────────────────────────────┐
+                      │  T5 (N=0.11)                                │
+                      │  "Cities evolve by balancing transport      │
+                      │    and information flow"                    │
+                      └─────────────────────────────────────────────┘
+
 
 ## Core Mechanism
 
@@ -31,7 +176,7 @@ SLP measures the conceptual distance between new submissions and existing knowle
 The Novelty Engine defines how conceptual novelty is measured and integrated.
 
 ### Semantic Embeddings
-Each submission is converted into a vector using a standardized, protocol-defined embedding model.
+Each submission is converted into a vector trajectory using a standardized, protocol-defined embedding model.
 
 ### Conceptual Distance
 The embedding is compared against the existing Concept Graph. Distance to nearest concepts determines novelty.
@@ -44,34 +189,22 @@ Every submission is linked to its closest conceptual parents. This establishes i
 
 ### Concept Lineage
 
+Concept - TBD. As of current view - it could be embedding vector trajectory segment.
+
 Each concept becomes a node in the global graph with:
-
  - authorship
-
  - vector representation
-
  - upstream parent concepts
-
  - novelty metadata
-
- - downstream usage links
 
 This lineage enables automated royalty allocation and downstream contribution tracing.
 
 ### Semantic State
 
 The shared semantic state is a distributed graph containing:
-
  - concepts
-
- - semantic relationships
-
- - embeddings
-
+ - lineage relationships
  - novelty scores
-
- - lineage metadata
-
  - ownership records
 
 The structure expands over time as new concepts are proposed and validated.
@@ -96,54 +229,48 @@ Authors of high-novelty concepts receive ongoing micro-fees as downstream ideas 
 
 A submission is rational only if expected royalty yield exceeds publication cost. This creates a natural quality filter without manual moderation.
 
-### Node Rewards
+### Infrastructure Node Rewards
 
 Nodes providing inference, storage, and validation earn proportional rewards based on their role in maintaining the semantic state.
 
 ### Distributed Consensus
 
 Nodes reach agreement on:
-
  - novelty scores
-
  - lineage links
-
- - concept validity
-
  - reward distributions
-
  - embedding checkpoint updates
 
 Consensus ensures global consistency and prevents manipulation of novelty scoring.
 
 ### Protocol Components
 
-Novelty Engine: Formal definition of conceptual distance and scoring.
+ 1. Novelty Engine: Formal definition of conceptual distance and scoring.
+ 2. Lineage Model: Rules for authorship attribution and propagation.
+ 3. Concept Graph: Data structure for concepts, embeddings, and metadata.
+ 4. Consensus Rules: Validation, conflict resolution, and state synchronization.
+ 5. Economic Rules: Publishing fees, royalty mechanics, and node incentives.
+ 6. Security: Defenses against synthetic novelty attacks, concept squatting or hijacking.
 
-Lineage Model: Rules for authorship attribution and propagation.
+## Technical Viability
 
-Concept Graph: Data structure for concepts, embeddings, and metadata.
+Transformers enable fine-grained semantic understanding. A practical PoC can:
+ - Extract hidden-state trajectories.
+ - Compare segment-level distances.
+ - Compute novelty relative to existing trajectories.
+ - Scale to multimodal representations.
+ - This low-level semantic comparison forms the backbone of SLP’s novelty diff.
 
-Consensus Rules: Validation, conflict resolution, and state synchronization.
 
-Economic Rules: Publishing fees, royalty mechanics, and node incentives.
+### Goals of This Specification and PoC
 
-Security: Anti-sybil mechanisms and defenses against synthetic novelty attacks.
-
-### Goals of This Specification
-
-Define the functional and mathematical requirements of the protocol.
-
-Provide implementation-agnostic specifications for experimentation and research.
-
-Support interoperable implementations in both open and closed environments.
-
-Establish a neutral reference standard for semantic novelty evaluation.
+ - Define the vision and requirements of the protocol.
+ - Test technical viability and demand for the system on text based data.
 
 ## Status
 
 Early-stage conceptual specification.
-Formal math, diagrams, and reference pseudocode will be added progressively.
+PoC draft.
 
 ## Running the Prototype (Docker)
 
