@@ -36,6 +36,7 @@ A writer submits a short concept T1:
 "Cities behave like living organisms: they grow, adapt, and metabolize information."
 
 Novelty Score:0.82
+
 Parents: T0 (networlk genesis-level concept)
 
 Explanation:
@@ -47,6 +48,7 @@ Another author submits T2:
 "A city`s transportation system acts as its circulatory system, distributing energy and resources."
 
 Novelty Score:0.41
+
 Parent: T1
 
 Trajectory similarity shows T2 is conceptually downstream from T1:
@@ -64,6 +66,7 @@ A third author submits T3:
 "In living cities, information flow - not transportation - is the true lifeblood."
 
 Novelty Score:0.47
+
 Parents:
  - T1 (dominant)
  - Partial link to T2 (weaker, because it flips the framing)
@@ -83,6 +86,7 @@ A writer merges both branches into a deeper insight T4:
 "A city`s circulatory and informational flows interact like biological feedback loops - transport enables data exchange, and data reorganizes transport."
 
 Novelty Score:0.36
+
 Parents (weighted):
  - T2: 52%
  - T3: 34%
@@ -95,7 +99,7 @@ This is a semantic interpolation:
 
 Introduces a new integrated mechanism ("feedback loops")
 
-Royalty split for T₃:
+Royalty split for T4:
  - T4 author: 36%
  - T2 author: 52% of remaining 64%
  - T3 author: 34% of remaining 64%
@@ -108,6 +112,7 @@ Someone submits T5:
 "Cities evolve by balancing transportation needs with information flow."
 
 Novelty Score:0.11
+
 Parents (dominant):
  - T2
  - T3
